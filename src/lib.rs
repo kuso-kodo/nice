@@ -1,17 +1,22 @@
 use std::fmt;
 
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+cfg_if::cfg_if! {
+    if #[cfg(target_os = "windows")] {
+        mod windows;
+        pub use windows::set_thread_priority;
+        #[derive(Debug)]
+        pub struct OsError(pub(crate) u32);
+    } else {
+        mod unix;
+        pub use unix::set_thread_priority;
+        #[derive(Debug)]
+        pub struct OsError(pub(crate) i32);
+    }
 }
 
-pub mod unix;
-
-pub const PRIORITY_MAX: u8 = 100;
+const PRIORITY_MAX: u8 = 100;
 
 pub(crate) type Result<T> = std::result::Result<T, OsError>;
-
-#[derive(Debug)]
-pub struct OsError(pub(crate) i32);
 
 impl fmt::Display for OsError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -27,16 +32,5 @@ pub struct Priority(u8);
 impl From<u8> for Priority {
     fn from(value: u8) -> Priority {
         Priority(value.min(PRIORITY_MAX))
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
     }
 }

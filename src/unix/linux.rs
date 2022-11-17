@@ -1,4 +1,4 @@
-//! 在 Linux/Android 平台，使用 [`setpriority`] 设置优先级。
+//! 在 Linux/Android 平台，使用 `setpriority` 设置优先级。
 //!
 //! - Ref: <https://linux.die.net/man/2/setpriority>
 
@@ -26,7 +26,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_to_nice() {
+    fn test_linux() {
         assert_eq!(Priority::from(0).to_nice(), 19);
         assert_eq!(Priority::from(100).to_nice(), -20);
         // 优先级越高，nice 越小

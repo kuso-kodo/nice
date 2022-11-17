@@ -1,4 +1,4 @@
-//! 在 macOS/iOS 平台，使用 [`pthread_setschedparam`] 设置优先级。
+//! 在 macOS/iOS 平台，使用 `pthread_setschedparam` 设置优先级。
 //!
 //! - Ref: <https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/Multithreading/CreatingThreads/CreatingThreads.html#Setting%20the%20Thread%20Priority>
 
@@ -46,7 +46,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_to_posix() -> Result<()> {
+    fn test_apple() -> Result<()> {
         assert!(Priority::from(50).to_posix(0, 100) < Priority::from(70).to_posix(0, 100));
         set_thread_priority(Priority::from(50)).unwrap();
         set_thread_priority(Priority::from(90)).unwrap();

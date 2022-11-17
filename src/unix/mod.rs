@@ -1,14 +1,16 @@
-#[cfg(any(target_os = "macos", target_os = "ios"))]
-mod apple;
-#[cfg(any(target_os = "linux", target_os = "android"))]
-mod linux;
-
-#[cfg(any(target_os = "macos", target_os = "ios"))]
-pub use apple::set_thread_priority;
-#[cfg(any(target_os = "linux", target_os = "android"))]
-pub use linux::set_thread_priority;
-
 use crate::{OsError, Result};
+
+cfg_if::cfg_if! {
+    if #[cfg(any(target_os = "macos", target_os = "ios"))] {
+        mod apple;
+        pub use apple::set_thread_priority;
+    } else if #[cfg(any(target_os = "linux", target_os = "android"))] {
+        mod linux;
+        pub use linux::set_thread_priority;
+    } else {
+        compile_error!("Your OS is probably not supported.");
+    }
+}
 
 #[inline]
 fn call_libc_set_errno<T, F: FnOnce() -> T>(f: F) -> Result<T> {
@@ -39,7 +41,7 @@ fn errno() -> libc::c_int {
             } else if #[cfg(any(target_os = "macos", target_os = "ios"))] {
                 *libc::__error()
             } else {
-                compile_error!("Your OS is probably not supported.")
+                compile_error!("Your OS is probably not supported.");
             }
         }
     }
@@ -55,7 +57,7 @@ fn set_errno(number: libc::c_int) {
             } else if #[cfg(any(target_os = "macos", target_os = "ios"))] {
                 *libc::__error() = number;
             } else {
-                compile_error!("Your OS is probably not supported.")
+                compile_error!("Your OS is probably not supported.");
             }
         }
     }
